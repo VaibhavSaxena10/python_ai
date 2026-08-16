@@ -1,4 +1,3 @@
-from ast import Add
 from pydantic import BaseModel 
 
 class Address(BaseModel):
@@ -21,3 +20,6 @@ patient_dict = {'name' : 'vaibhav' , 'age' : 25 , 'gender' : 'male' , 'address':
 patient1= Patient(**patient_dict)
 
 print (patient1)
+
+print( patient1.name)
+print( patient1.address)

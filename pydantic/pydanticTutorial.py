@@ -1,14 +1,14 @@
 import weakref
 from pydantic import BaseModel, EmailStr, AnyUrl, Field
-from typing import List, Optional
+from typing import List, Optional , Annotated 
 class Patient(BaseModel):
-    name: str
-    age: int
+    name: Annotated [str, Field(max_lenght = 50, title = "Name of the patient", description = "Enter the name of the patient in 50 characters")]
+    age: int = Field(gt = 0, lt = 120)
     email: EmailStr
     Linkedin_url: AnyUrl
     weight: float
     married: bool = False
-    allergies: Optional[List[str]] = None
+    allergies: Optional[List[str]] = Field(max_length= 5)
     contact_details: dict[str,str]
 
 def insert_patient_data(patient : Patient):
