@@ -2,40 +2,47 @@
 from fastapi import FastAPI
 # pyrefly: ignore [missing-import]
 from fastapi.responses import JSONResponse
-
-from Model.predict import predict_output, MODEL_VERSION
-import pandas as pd
+# pyrefly: ignore [missing-import]
 from schema.user_input import UserInput
+# pyrefly: ignore [missing-import]
+from schema.prediction_response import PredictionResponse
+# pyrefly: ignore [missing-import]
+from Model.predict import predict_output, model, MODEL_VERSION
 
+app = FastAPI()
 
-app= FastAPI()
-
-
-
-#pydantic model to validate data
-
-
-#human Readable
+# human readable       
 @app.get('/')
 def home():
-    return {"message": "Welcome to the Insurance Premium Prediction API"}
-#Machine Readable
+    return {'message':'Insurance Premium Prediction API'}
+
+# machine readable
 @app.get('/health')
 def health_check():
-    return {"status":"ok", "version": MODEL_VERSION}
+    return {
+        'status': 'OK',
+        'version': MODEL_VERSION,
+        'model_loaded': model is not None
+    }
 
-@app.post('/predict')
-def predict__premium(data:UserInput):
-    user_input={
+@app.post('/predict', response_model=PredictionResponse)
+def predict_premium(data: UserInput):
+
+    user_input = {
         'bmi': data.bmi,
         'age_group': data.age_group,
-        'lifestyle_risk': data.lifestyle,
+        'lifestyle_risk': data.lifestyle_risk,
         'city_tier': data.city_tier,
         'income_lpa': data.income_lpa,
         'occupation': data.occupation
     }
+
     try:
+
         prediction = predict_output(user_input)
-        return JSONResponse(status_code=200, content={'predicted_category': prediction})
+
+        return JSONResponse(status_code=200, content={'response': prediction})
+    
     except Exception as e:
-        return JSONResponse(status_code=500, content={'error': 'Internal server error', 'details': str(e)})
+
+        return JSONResponse(status_code=500, content=str(e))
